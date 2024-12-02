@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linkvertise Bypass</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #bypass-section {
+            margin-top: 20px;
+        }
+        #output {
+            margin-top: 20px;
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Linkvertise Bypass</h1>
+    <form id="bypass-form">
+        <div class="g-recaptcha" data-sitekey="your-site-key"></div>
+        <input type="url" id="url" name="url" placeholder="Enter Linkvertise URL" required style="width: 80%; padding: 10px;">
+        <button type="button" onclick="bypass()" style="padding: 10px 20px; margin-top: 10px;">Start</button>
+    </form>
+    <div id="output"></div>
+
+    <script>
+        function bypass() {
+            const url = document.getElementById("url").value;
+            const captchaResponse = grecaptcha.getResponse();
+            if (!captchaResponse) {
+                alert("Please complete the captcha!");
+                return;
+            }
+
+            fetch("/bypass", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({ url: url })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const output = document.getElementById("output");
+                if (data.success) {
+                    output.textContent = `Bypassed URL: ${data.bypassed_url}`;
+                } else {
+                    output.textContent = `Error: ${data.message}`;
+                }
+            })
+            .catch(err => console.error(err));
+        }
+    </script>
+</body>
+</html>
